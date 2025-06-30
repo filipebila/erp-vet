@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Novo Paciente{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-success mb-4">Novo Paciente</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            <strong>Erro!</strong> Verifique os campos obrigatórios:
+            <ul class="mb-0">
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_tutor" class="form-label">Tutor</label>
+                {{ form.tutor }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_nome" class="form-label">Nome</label>
+                {{ form.nome }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_especie" class="form-label">Espécie</label>
+                {{ form.especie }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_raca" class="form-label">Raça</label>
+                <select id="raca_custom" class="form-select" data-selected="{{ form.raca.value }}"></select>
+                {{ form.raca.as_hidden }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_sexo" class="form-label">Sexo</label>
+                {{ form.sexo }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_data_nascimento" class="form-label">Data de Nascimento</label>
+                {{ form.data_nascimento }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_peso" class="form-label">Peso (kg)</label>
+                {{ form.peso }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_microchip" class="form-label">Microchip</label>
+                {{ form.microchip }}
+            </div>
+            <div class="col-md-12 mb-3">
+                <label for="id_alergias" class="form-label">Alergias</label>
+                {{ form.alergias }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Salvar Paciente
+        </button>
+        <a href="{% url 'pacientes-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+
+<script>
+    const racasCachorro = {{ RACAS_CACHORRO|safe }};
+    const racasGato = {{ RACAS_GATO|safe }};
+
+    function atualizarRacas() {
+        const especie = document.getElementById("id_especie").value;
+        const racaSelect = document.getElementById("raca_custom");
+        const racaAtual = racaSelect.getAttribute("data-selected");
+
+        let racas = [];
+        if (especie === 'Cachorro') {
+            racas = racasCachorro;
+        } else if (especie === 'Gato') {
+            racas = racasGato;
+        }
+
+        racaSelect.innerHTML = '';
+        racas.forEach(function(raca) {
+            let option = document.createElement("option");
+            option.text = raca;
+            option.value = raca;
+            if (raca === racaAtual) {
+                option.selected = true;
+            }
+            racaSelect.add(option);
+        });
+
+        // Atualiza valor no campo escondido do formulário
+        racaSelect.addEventListener("change", function () {
+            document.getElementById("id_raca").value = racaSelect.value;
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const especieSelect = document.getElementById("id_especie");
+        if (especieSelect) {
+            especieSelect.addEventListener("change", atualizarRacas);
+            atualizarRacas();
+        }
+
+        // Força sincronização ao carregar
+        const racaSelect = document.getElementById("raca_custom");
+        if (racaSelect) {
+            racaSelect.addEventListener("change", function () {
+                document.getElementById("id_raca").value = racaSelect.value;
+            });
+        }
+    });
+</script>
+{% endblock %}

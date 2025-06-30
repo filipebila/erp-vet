@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pacientes Cadastrados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Pacientes Cadastrados</h2>
+        <a href="{% url 'paciente-create' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Novo Paciente
+        </a>
+    </div>
+
+    {% if pacientes %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Espécie</th>
+                        <th>Raça</th>
+                        <th>Tutor</th>
+                        <th>Sexo</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for paciente in pacientes %}
+                        <tr>
+                            <td>{{ paciente.nome }}</td>
+                            <td>{{ paciente.especie }}</td>
+                            <td>{{ paciente.raca }}</td>
+                            <td>{{ paciente.tutor.nome }}</td>
+                            <td>{{ paciente.sexo }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'paciente-detail' paciente.pk %}" class="btn btn-sm btn-info text-white" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'paciente-update' paciente.pk %}" class="btn btn-sm btn-warning text-white" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'paciente-delete' paciente.pk %}" class="btn btn-sm btn-danger" title="Excluir" onclick="return confirm('Deseja realmente excluir este paciente?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Nenhum paciente cadastrado até o momento.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

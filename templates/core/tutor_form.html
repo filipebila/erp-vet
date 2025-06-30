@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Novo Tutor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-success mb-4">Novo Tutor</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_nome" class="form-label">Nome</label>
+                {{ form.nome }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_cpf" class="form-label">CPF</label>
+                {{ form.cpf }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_telefone" class="form-label">Telefone</label>
+                {{ form.telefone }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_email" class="form-label">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="col-md-12 mb-3">
+                <label for="id_endereco" class="form-label">Endereço</label>
+                {{ form.endereco }}
+            </div>
+            <div class="col-md-12 mb-3">
+                <label for="id_observacoes" class="form-label">Observações</label>
+                {{ form.observacoes }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Salvar Tutor
+        </button>
+        <a href="{% url 'tutores-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

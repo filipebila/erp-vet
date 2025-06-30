@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Django
+/media/
+*.pot
+*.pyc
+
+# Ambiente virtual
+env/
+venv/
+
+# macOS
+.DS_Store
+
+# VSCode e PyCharm
+.vscode/
+.idea/
+
+# Arquivos sensíveis
+.env

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-danger">Confirmar Exclusão</h2>
+    <div class="alert alert-warning mt-3">
+        Tem certeza que deseja excluir a consulta de <strong>{{ consulta.paciente.nome }}</strong>
+        marcada para <strong>{{ consulta.data_hora|date:"d/m/Y H:i" }}</strong>?
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Confirmar Exclusão
+        </button>
+        <a href="{% url 'consultas-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

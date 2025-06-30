@@ -1,0 +1,48 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}Bem-vindo ao ERP Vet{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row align-items-center">
+    <!-- Coluna da Apresentação -->
+    <div class="col-md-6 mb-4">
+      <h1 class="display-5 fw-bold text-primary">ERP Veterinário Profissional</h1>
+      <p class="lead">Agenda inteligente, prontuários integrados, comunicação com tutores, relatórios e muito mais. Tudo que sua clínica precisa em um só lugar.</p>
+      <ul class="list-unstyled">
+        <li>✅ Agendamento com lembretes automáticos</li>
+        <li>✅ Prontuário com gravação de voz</li>
+        <li>✅ Integração com WhatsApp</li>
+        <li>✅ Suporte a fotos e vídeos no atendimento</li>
+      </ul>
+    </div>
+
+    <!-- Coluna de Login -->
+    <div class="col-md-5 offset-md-1">
+      <div class="card shadow p-4">
+        <h4 class="mb-3 text-center">Acesso ao Sistema</h4>
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <strong>Erro:</strong> Verifique suas credenciais.
+            </div>
+          {% endif %}
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Usuário</label>
+            <input type="text" name="username" class="form-control" id="id_username" required>
+          </div>
+          <div class="mb-3">
+            <label for="id_password" class="form-label">Senha</label>
+            <input type="password" name="password" class="form-control" id="id_password" required>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Entrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

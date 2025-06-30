@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Consultas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">🩺 Consultas Realizadas</h2>
+        <a href="{% url 'agendamentos-hoje' %}" class="btn btn-outline-primary">
+            <i class="bi bi-calendar-check"></i> Atendimentos do Dia
+        </a>
+    </div>
+
+    {% if consultas %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Tutor</th>
+                        <th>Data e Hora</th>
+                        <th>Motivo</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consulta in consultas %}
+                        <tr>
+                            <td>{{ consulta.paciente.nome }}</td>
+                            <td>{{ consulta.paciente.tutor.nome }}</td>
+                            <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
+                            <td>{{ consulta.motivo }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'consultas-detail' consulta.pk %}" class="btn btn-outline-primary btn-sm" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'consulta-atendimento' consulta.pk %}" class="btn btn-warning btn-sm" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'consultas-delete' consulta.pk %}" class="btn btn-outline-danger btn-sm" title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">Nenhuma consulta registrada.</div>
+    {% endif %}
+</div>
+{% endblock %}

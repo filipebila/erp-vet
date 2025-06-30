@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Tutor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-info mb-4">Detalhes do Tutor</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Nome:</strong> {{ tutor.nome }}</p>
+            <p><strong>CPF:</strong> {{ tutor.cpf }}</p>
+            <p><strong>Telefone:</strong> {{ tutor.telefone }}</p>
+            <p><strong>Email:</strong> {{ tutor.email }}</p>
+            <p><strong>Endereço:</strong> {{ tutor.endereco }}</p>
+            <p><strong>Observações:</strong> {{ tutor.observacoes }}</p>
+            <p><strong>Data de Cadastro:</strong> {{ tutor.data_cadastro|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'tutor-update' tutor.pk %}" class="btn btn-warning text-white">
+            <i class="bi bi-pencil-square"></i> Editar
+        </a>
+        <a href="{% url 'tutor-delete' tutor.pk %}" class="btn btn-danger" onclick="return confirm('Deseja realmente excluir este tutor?');">
+            <i class="bi bi-trash"></i> Excluir
+        </a>
+        <a href="{% url 'tutores-list' %}" class="btn btn-secondary ms-2">Voltar</a>
+    </div>
+</div>
+{% endblock %}

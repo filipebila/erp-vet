@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Bem-vindo, {{ user.get_full_name|default:user.username }}!</h2>
+    <p class="text-muted">Você está logado como <strong>{{ user.cargo|title }}</strong> no sistema da <strong>{{ request.tenant.nome }}</strong>.</p>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Tutores</h5>
+                    <p class="card-text">Acesse e gerencie os tutores cadastrados.</p>
+                    <a href="{% url 'tutores-list' %}" class="btn btn-success">Ver tutores</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Pacientes</h5>
+                    <p class="card-text">Veja os pacientes ativos na clínica.</p>
+                    <a href="{% url 'pacientes-list' %}" class="btn btn-success">Ver pacientes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Agendamentos</h5>
+                    <p class="card-text">Confira os agendamentos programados.</p>
+                    <a href="{% url 'agendamentos-list' %}" class="btn btn-success">Ver agendamentos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

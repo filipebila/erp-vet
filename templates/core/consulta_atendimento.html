@@ -1,0 +1,138 @@
+<!-- consulta_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- Coluna 1: Info Rápida -->
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Paciente</h5>
+          <p><strong>Nome:</strong> {{ consulta.paciente.nome }}</p>
+          <p><strong>Espécie:</strong> {{ consulta.paciente.especie }}</p>
+          <p><strong>Raça:</strong> {{ consulta.paciente.raca }}</p>
+          <p><strong>Idade:</strong> {{ consulta.paciente.idade }}</p>
+          <p><strong>Peso:</strong> {{ consulta.paciente.peso }} kg</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna 2: Formulário de Consulta -->
+    <div class="col-md-6 mb-3">
+      <form method="post" enctype="multipart/form-data">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <strong>
+                    {% if message.tags == "success" %}✅ Sucesso!
+                    {% elif message.tags == "error" %}❌ Erro!
+                    {% elif message.tags == "warning" %}⚠ Atenção:
+                    {% else %}ℹ
+                    {% endif %}
+                </strong> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% csrf_token %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Prontuário</h5>
+            
+            <div class="mb-2">
+              <label>Motivo</label>
+              <input type="text" name="motivo" class="form-control" value="{{ consulta.motivo }}">
+            </div>
+            <div class="mb-2">
+              <label>Anamnese</label>
+              <textarea name="anamnese" class="form-control">{{ consulta.anamnese }}</textarea>
+            </div>
+            <div class="mb-2">
+              <label>Exame Físico</label>
+              <textarea name="exame_fisico" class="form-control">{{ consulta.exame_fisico }}</textarea>
+            </div>
+            <div class="mb-2">
+              <label>Diagnóstico</label>
+              <textarea name="diagnostico" class="form-control">{{ consulta.diagnostico }}</textarea>
+            </div>
+            <div class="mb-2">
+              <label>Exames Solicitados</label>
+              <textarea name="exames_solicitados" class="form-control">{{ consulta.exames_solicitados }}</textarea>
+            </div>
+            <div class="mb-2">
+              <label>Tratamento</label>
+              <textarea name="tratamento" class="form-control">{{ consulta.tratamento }}</textarea>
+            </div>
+
+            <!-- Observações com Gravação de Voz -->
+            <div class="mb-2">
+              <label>Observações (com voz)</label>
+              <textarea name="observacoes" id="observacoes" class="form-control">{{ consulta.observacoes }}</textarea>
+              <button type="button" class="btn btn-outline-secondary mt-2" onclick="startRecording()">🎤 Gravar Observação</button>
+            </div>
+
+            <!-- Upload de Arquivos -->
+            <div class="mb-2">
+              <label>Fotos/Vídeos</label>
+              <input type="file" name="arquivos" accept="image/*,video/*" capture class="form-control">
+            </div>
+
+            <div class="mb-2">
+                <label for="id_retorno_necessario">Retorno necessário?</label><br>
+                <input type="checkbox" name="retorno_necessario" id="id_retorno_necessario"
+                       {% if consulta.retorno_necessario %}checked{% endif %} class="form-check-input">
+            </div>
+              
+            <div class="mb-2">
+                <label for="id_data_retorno">Data do retorno</label>
+                <input type="datetime-local" name="data_retorno" id="id_data_retorno"
+                       class="form-control"
+                       {% if consulta.data_retorno %}
+                         value="{{ consulta.data_retorno|date:'Y-m-d\\TH:i' }}"
+                       {% endif %}>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar Consulta</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Coluna 3: Histórico -->
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Histórico</h5>
+          {% for c in historico %}
+            <p>● {{ c.data_hora|date:"d/m/Y H:i" }}<br>
+            <small>{{ c.motivo }}</small></p>
+          {% empty %}
+            <p>Sem histórico.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function startRecording() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = 'pt-BR';
+  recognition.start();
+
+  recognition.onresult = function(event) {
+    const result = event.results[0][0].transcript;
+    document.getElementById('observacoes').value += "\n" + result;
+  };
+
+  recognition.onerror = function(event) {
+    alert('Erro na gravação de voz: ' + event.error);
+  }
+}
+</script>
+{% endblock %}

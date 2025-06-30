@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ERP Veterinário{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #198754;
+            color: white;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #146c43;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block sidebar py-4">
+            <div class="text-center mb-4">
+                <h5 class="fw-bold">ERP-Vet</h5>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tutores-list' %}">
+                        <i class="bi bi-person-lines-fill"></i> Tutores
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pacientes-list' %}">
+                        <i class="bi bi-heart-pulse"></i> Pacientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'agendamentos-list' %}">
+                        <i class="bi bi-calendar-check"></i> Agendamentos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'agendamentos-hoje' %}">📅 Agendamentos do Dia</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'consultas-list' %}">
+                        <i class="bi bi-clipboard2-pulse"></i> Consultas
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Conteúdo principal -->
+        <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

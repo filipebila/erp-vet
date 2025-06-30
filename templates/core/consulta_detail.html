@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Consulta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-primary">Detalhes da Consulta</h2>
+    <div class="card mt-3">
+        <div class="card-body">
+            <p><strong>Paciente:</strong> {{ consulta.paciente.nome }}</p>
+            <p><strong>Tutor:</strong> {{ consulta.paciente.tutor.nome }}</p>
+            <p><strong>Data e Hora:</strong> {{ consulta.data_hora|date:"d/m/Y H:i" }}</p>
+            <p><strong>Motivo:</strong> {{ consulta.motivo }}</p>
+            <p><strong>Anamnese:</strong> {{ consulta.anamnese }}</p>
+            <p><strong>Exame Físico:</strong> {{ consulta.exame_fisico }}</p>
+            <p><strong>Diagnóstico:</strong> {{ consulta.diagnostico }}</p>
+            <p><strong>Exames Solicitados:</strong> {{ consulta.exames_solicitados }}</p>
+            <p><strong>Observações:</strong> {{ consulta.observacoes }}</p>
+            <p><strong>Tratamento:</strong> {{ consulta.tratamento }}</p>
+            <p><strong>Retorno Necessário:</strong> {{ consulta.retorno_necessario|yesno:"Sim,Não" }}</p>
+            {% if consulta.retorno_necessario and consulta.data_retorno %}
+                <p><strong>Data do Retorno:</strong> {{ consulta.data_retorno|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+
+            {% if consulta.arquivos.all %}
+                <h5>Arquivos</h5>
+                <ul>
+                    {% for arquivo in consulta.arquivos.all %}
+                    {% if arquivo.tipo == 'foto' %}
+                        <li>
+                        <a href="{{ arquivo.arquivo.url }}" target="_blank">
+                            <img src="{{ arquivo.arquivo.url }}" alt="Foto" class="img-thumbnail mb-2" style="max-width: 200px;">
+                        </a>
+                        </li>
+                    {% elif arquivo.tipo == 'video' %}
+                        <li>
+                        <a href="{{ arquivo.arquivo.url }}" target="_blank">🎥 Ver vídeo</a>
+                        </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mt-3">
+        {% if not consulta.anamnese and not consulta.diagnostico %}
+          <a href="{% url 'consulta-atendimento' consulta.pk %}" class="btn btn-info">📋 Iniciar Atendimento</a>
+        {% endif %}
+        <a href="{% url 'consulta-atendimento' consulta.pk %}" class="btn btn-warning">Editar Consulta</a>
+        <a href="{% url 'consultas-delete' consulta.pk %}" class="btn btn-danger ms-2">Excluir</a>
+        <a href="{% url 'consultas-list' %}" class="btn btn-secondary ms-2">Voltar</a>
+    </div>
+</div>
+{% endblock %}

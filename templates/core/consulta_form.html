@@ -1,0 +1,91 @@
+{% comment %}
+Este formulário foi substituído pelo atendimento clínico em tempo real (consulta_atendimento.html)
+Não é mais utilizado no sistema. Manter apenas como referência, se necessário.
+
+{% extends 'base.html' %}
+
+{% block title %}Nova Consulta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-success mb-4">Nova Consulta</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Erro!</strong> Verifique os campos obrigatórios:
+            <ul class="mb-0">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_agendamento" class="form-label">Agendamento</label>
+                {{ form.agendamento }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_data_hora" class="form-label">Data e Hora</label>
+                {{ form.data_hora }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_motivo" class="form-label">Motivo da Consulta</label>
+                {{ form.motivo }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_anamnese" class="form-label">Anamnese</label>
+                {{ form.anamnese }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_exame_fisico" class="form-label">Exame Físico</label>
+                {{ form.exame_fisico }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_diagnostico" class="form-label">Diagnóstico</label>
+                {{ form.diagnostico }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_exames_solicitados" class="form-label">Exames Solicitados</label>
+                {{ form.exames_solicitados }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_tratamento" class="form-label">Tratamento</label>
+                {{ form.tratamento }}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="id_observacoes" class="form-label">Observações</label>
+                {{ form.observacoes }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_retorno_necessario" class="form-label">Retorno Necessário?</label><br>
+                {{ form.retorno_necessario }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_data_retorno" class="form-label">Data do Retorno</label>
+                {{ form.data_retorno }}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Salvar Consulta
+        </button>
+        <a href="{% url 'consultas-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
+
+{% endcomment %}

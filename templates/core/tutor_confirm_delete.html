@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-danger">Excluir Tutor</h2>
+    <p class="mt-3">Tem certeza de que deseja excluir o tutor <strong>{{ object.nome }}</strong>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Confirmar Exclusão
+        </button>
+        <a href="{% url 'tutores-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

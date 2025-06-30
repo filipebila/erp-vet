@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tutores Cadastrados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Tutores Cadastrados</h2>
+        <a href="{% url 'tutor-create' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Novo Tutor
+        </a>
+    </div>
+
+    {% if tutores %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Telefone</th>
+                        <th>Email</th>
+                        <th>Data de Cadastro</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tutor in tutores %}
+                        <tr>
+                            <td>{{ tutor.nome }}</td>
+                            <td>{{ tutor.cpf }}</td>
+                            <td>{{ tutor.telefone }}</td>
+                            <td>{{ tutor.email }}</td>
+                            <td>{{ tutor.data_cadastro|date:"d/m/Y" }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'tutor-detail' tutor.pk %}" class="btn btn-sm btn-info text-white" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'tutor-update' tutor.pk %}" class="btn btn-sm btn-warning text-white" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'tutor-delete' tutor.pk %}" class="btn btn-sm btn-danger" title="Excluir" onclick="return confirm('Deseja realmente excluir este tutor?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Nenhum tutor cadastrado até o momento.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

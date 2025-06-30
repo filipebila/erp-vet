@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Agendamentos do Dia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-primary mb-4">📅 Agendamentos de Hoje</h2>
+
+  {% if agendamentos_dia %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Horário</th>
+          <th>Paciente</th>
+          <th>Tutor</th>
+          <th>Motivo</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ag in agendamentos_dia %}
+        <tr>
+          <td>{{ ag.data_hora|date:"H:i" }}</td>
+          <td>{{ ag.paciente.nome }}</td>
+          <td>{{ ag.paciente.tutor.nome }}</td>
+          <td>{{ ag.motivo }}</td>
+          <td>
+            {% if ag.status == 'Confirmado' %}
+              <span class="badge bg-success">Confirmado</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pendente</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if ag.consulta %}
+              <a href="{% url 'consulta-atendimento' ag.consulta.pk %}" class="btn btn-outline-primary btn-sm">📋 Retomar Consulta</a>
+            {% else %}
+              <a href="{% url 'iniciar-consulta' ag.pk %}" class="btn btn-success btn-sm">📋 Iniciar Consulta</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">Nenhum agendamento para hoje.</div>
+  {% endif %}
+</div>
+{% endblock %}
