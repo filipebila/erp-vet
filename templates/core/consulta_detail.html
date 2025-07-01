@@ -40,6 +40,31 @@
                     {% endfor %}
                 </ul>
             {% endif %}
+            {% if consulta.anamnese or consulta.diagnostico or consulta.tratamento %}
+                <div class="mt-4">
+                    {% if consulta.status_analise_ia == "concluida" and consulta.analise_ia %}
+                        <div class="alert alert-info d-flex justify-content-between align-items-center">
+                            <div>
+                                ✅ <strong>Análise da IA concluída</strong> — Pronta para visualização.
+                            </div>
+                            <a href="{% url 'analise_ia' consulta.id %}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-search"></i> Ver Análise
+                            </a>
+                        </div>
+                    {% elif consulta.status_analise_ia == "em_analise" %}
+                        <div class="alert alert-warning">⏳ A análise da IA está em andamento...</div>
+                    {% elif consulta.status_analise_ia == "erro" %}
+                        <div class="alert alert-danger">⚠️ Houve um erro ao processar a análise da IA.</div>
+                    {% else %}
+                        <form method="post" action="{% url 'gerar_analise_ia' consulta.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-robot"></i> Analisar com IA
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="mt-3">

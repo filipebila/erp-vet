@@ -1,5 +1,5 @@
 #core/views.py
-
+import os
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy, reverse
@@ -12,6 +12,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.utils.timezone import localtime
 from django.contrib.auth.forms import AuthenticationForm
+from openai import OpenAI
+from django.views.decorators.csrf import csrf_exempt
+from dotenv import load_dotenv
 
 
 class TutorListView(ListView):
@@ -222,6 +225,7 @@ class AtendimentoConsultaView(View):
         # ✅ resposta garantida para todos os casos
         messages.success(request, "Consulta atualizada com sucesso!")
         return redirect("consultas-detail", pk=consulta.pk)
+    
 class AgendamentosDoDiaView(ListView):
     model = Agendamento
     template_name = 'core/agendamentos_dia.html'
@@ -265,3 +269,80 @@ def landing_view(request):
 @login_required
 def dashboard_view(request):
     return render(request, 'dashboard.html')
+
+
+load_dotenv()  # Garante que .env seja lido, útil em dev
+@csrf_exempt
+#@login_required
+def gerar_analise_ia(request, consulta_id):
+    consulta = get_object_or_404(Consulta, pk=consulta_id)
+    consulta.status_analise_ia = "em_analise"
+    consulta.save()
+
+    try:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        # Monta parte base do prompt
+        prompt = f"""
+Você é um veterinário consultor. Avalie o atendimento abaixo e forneça uma análise crítica profissional.
+
+📄 Dados do paciente:
+- Nome: {consulta.paciente.nome}
+- Espécie: {consulta.paciente.especie}
+- Raça: {consulta.paciente.raca}
+- Data de nascimento: {consulta.paciente.data_nascimento}
+
+📋 Consulta:
+- Motivo: {consulta.motivo}
+- Anamnese: {consulta.anamnese}
+- Exame físico: {consulta.exame_fisico}
+- Diagnóstico: {consulta.diagnostico}
+- Exames solicitados: {consulta.exames_solicitados}
+- Tratamento: {consulta.tratamento}
+- Observações: {consulta.observacoes}
+"""
+
+        # 🔍 Se houver imagens vinculadas
+        imagens = consulta.arquivos.filter(tipo='foto')
+        if imagens.exists():
+            prompt += "\n📷 Imagens registradas durante o atendimento:\n"
+            for img in imagens:
+                prompt += f"- {request.scheme}://{request.get_host()}{img.arquivo.url}\n"
+
+        prompt += """
+🔎 Sua análise deve incluir:
+1. Avaliação do diagnóstico.
+2. Possíveis diagnósticos diferenciais.
+3. Sugestões de exames adicionais (se necessário).
+4. Avaliação da conduta terapêutica.
+5. Riscos ou cuidados não abordados.
+"""
+
+        # Envia para a OpenAI
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "Você é um especialista em medicina veterinária."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+
+        resultado = response.choices[0].message.content
+        consulta.analise_ia = resultado
+        consulta.status_analise_ia = "concluida"
+        consulta.save()
+        messages.success(request, "Análise gerada com sucesso!")
+
+    except Exception as e:
+        consulta.status_analise_ia = "erro"
+        consulta.save()
+        messages.error(request, f"Ocorreu um erro ao gerar a análise: {str(e)}")
+
+    return redirect('consultas-detail', consulta_id)
+
+@login_required
+def analise_ia(request, consulta_id):
+    consulta = get_object_or_404(Consulta, pk=consulta_id)
+    return render(request, 'core/analise_ia.html', {'consulta': consulta})

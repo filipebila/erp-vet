@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import AtendimentoConsultaView, AgendamentosDoDiaView, iniciar_consulta, landing_view, dashboard_view
+from .views import AtendimentoConsultaView, AgendamentosDoDiaView, iniciar_consulta, landing_view, dashboard_view, gerar_analise_ia, analise_ia
 from django.contrib.auth import views as auth_views
 
 
@@ -38,6 +38,10 @@ urlpatterns = [
     path('consultas/<int:pk>/excluir/', views.ConsultaDeleteView.as_view(), name='consultas-delete'),
     path('consultas/hoje/', AgendamentosDoDiaView.as_view(), name='agendamentos-hoje'),
     path('consultas/iniciar/<int:agendamento_id>/', iniciar_consulta, name='iniciar-consulta'),
+    
+    
+    path('consulta/<int:consulta_id>/analise-ia/', gerar_analise_ia, name='gerar_analise_ia'),
+    path('consulta/<int:consulta_id>/analise/', analise_ia, name='analise_ia'),
     
     path('consultas/<int:pk>/atendimento/', AtendimentoConsultaView.as_view(), name='consulta-atendimento'),
 
