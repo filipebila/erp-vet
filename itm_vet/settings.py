@@ -33,7 +33,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.localhost', '127.0.0.1', 'empresa-modelo.localhost']
+ALLOWED_HOSTS = ['*', '.localhost', '127.0.0.1', 'empresa-modelo.localhost', '3ae4-2804-18-133-790-e0c1-66c1-bdac-9162.ngrok-free.app']
 
 
 # Application definition
