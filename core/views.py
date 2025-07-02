@@ -1,5 +1,6 @@
 #core/views.py
-
+import os
+import traceback
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy, reverse
@@ -12,6 +13,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.utils.timezone import localtime
 from django.contrib.auth.forms import AuthenticationForm
+from openai import OpenAI
+from django.views.decorators.csrf import csrf_exempt
+from dotenv import load_dotenv
+
 
 
 class TutorListView(ListView):
@@ -169,6 +174,7 @@ class AtendimentoConsultaView(View):
     def post(self, request, pk):
         consulta = get_object_or_404(Consulta, pk=pk)
 
+        # Atualiza os campos do formulário
         consulta.motivo = request.POST.get("motivo")
         consulta.anamnese = request.POST.get("anamnese")
         consulta.exame_fisico = request.POST.get("exame_fisico")
@@ -181,7 +187,7 @@ class AtendimentoConsultaView(View):
         consulta.data_hora = timezone.now()
         consulta.save()
 
-        # Atualiza o status do agendamento, se necessário
+        # Atualiza status do agendamento
         if consulta.agendamento and consulta.agendamento.status != 'Confirmado':
             consulta.agendamento.status = 'Confirmado'
             consulta.agendamento.save()
@@ -203,25 +209,28 @@ class AtendimentoConsultaView(View):
                     status='Pendente'
                 )
 
-        # Upload de mídia, se houver
-        if request.FILES.get("arquivos"):
-            arquivo = request.FILES["arquivos"]
+        # Upload de múltiplos arquivos, se houver
+        for arquivo in request.FILES.getlist("arquivos"):
             tipo = "foto" if arquivo.content_type.startswith("image") else "video"
             tamanho_mb = round(arquivo.size / (1024 * 1024), 2)
 
             if tipo == "foto" and tamanho_mb > 5:
-                messages.error(request, "Imagem maior que 5MB não é permitida.")
-                return redirect("consulta-atendimento", pk=consulta.pk)
+                messages.warning(request, f"Imagem '{arquivo.name}' maior que 5MB não foi salva.")
+                continue
 
             if tipo == "video" and tamanho_mb > 20:
-                messages.error(request, "Vídeo maior que 20MB não é permitido.")
-                return redirect("consulta-atendimento", pk=consulta.pk)
+                messages.warning(request, f"Vídeo '{arquivo.name}' maior que 20MB não foi salvo.")
+                continue
 
-            ArquivoConsulta.objects.create(consulta=consulta, arquivo=arquivo, tipo=tipo)
-            
-        # ✅ resposta garantida para todos os casos
+            ArquivoConsulta.objects.create(
+                consulta=consulta,
+                arquivo=arquivo,
+                tipo=tipo
+            )
+
         messages.success(request, "Consulta atualizada com sucesso!")
         return redirect("consultas-detail", pk=consulta.pk)
+    
 class AgendamentosDoDiaView(ListView):
     model = Agendamento
     template_name = 'core/agendamentos_dia.html'
@@ -265,3 +274,85 @@ def landing_view(request):
 @login_required
 def dashboard_view(request):
     return render(request, 'dashboard.html')
+
+
+load_dotenv()  # Garante que .env seja lido, útil em dev
+@csrf_exempt
+#@login_required
+def gerar_analise_ia(request, consulta_id):
+    consulta = get_object_or_404(Consulta, pk=consulta_id)
+    consulta.status_analise_ia = "em_analise"
+    consulta.save()
+
+    try:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        # Base do prompt textual
+        prompt_texto = f"""
+Você é um veterinário consultor. Avalie o atendimento abaixo e forneça uma análise crítica profissional.
+
+📄 Dados do paciente:
+- Nome: {consulta.paciente.nome}
+- Espécie: {consulta.paciente.especie}
+- Raça: {consulta.paciente.raca}
+- Data de nascimento: {consulta.paciente.data_nascimento}
+
+📋 Consulta:
+- Motivo: {consulta.motivo}
+- Anamnese: {consulta.anamnese}
+- Exame físico: {consulta.exame_fisico}
+- Diagnóstico: {consulta.diagnostico}
+- Exames solicitados: {consulta.exames_solicitados}
+- Tratamento: {consulta.tratamento}
+- Observações: {consulta.observacoes}
+
+🔎 Sua análise deve incluir:
+1. Avaliação do diagnóstico.
+2. Possíveis diagnósticos diferenciais.
+3. Sugestões de exames adicionais (se necessário).
+4. Avaliação da conduta terapêutica.
+5. Riscos ou cuidados não abordados.
+"""
+
+        # Lista de conteúdos para o modelo (texto + imagens, se houver)
+        conteudo_usuario = [{"type": "text", "text": prompt_texto}]
+
+        imagens = consulta.arquivos.filter(tipo='foto')
+        if imagens.exists():
+            for img in imagens:
+                imagem_url = f"{request.scheme}://{request.get_host()}{img.arquivo.url}"
+                conteudo_usuario.append({
+                    "type": "image_url",
+                    "image_url": {"url": imagem_url}
+                })
+
+        # Envia para OpenAI com modelo vision
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Você é um especialista em medicina veterinária."},
+                {"role": "user", "content": conteudo_usuario}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+
+        resultado = response.choices[0].message.content
+        consulta.analise_ia = resultado
+        consulta.status_analise_ia = "concluida"
+        consulta.save()
+        messages.success(request, "Análise gerada com sucesso!")
+
+    except Exception as e:
+        consulta.status_analise_ia = "erro"
+        consulta.save()
+        print("❌ ERRO NA ANÁLISE IA:", e)
+        traceback.print_exc()
+        messages.error(request, f"Ocorreu um erro ao gerar a análise: {str(e)}")
+
+    return redirect('consultas-detail', consulta_id)
+
+@login_required
+def analise_ia(request, consulta_id):
+    consulta = get_object_or_404(Consulta, pk=consulta_id)
+    return render(request, 'core/analise_ia.html', {'consulta': consulta})

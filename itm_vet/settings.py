@@ -9,9 +9,12 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
+import dotenv
 from pathlib import Path
 
+
+dotenv.load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,10 +28,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zm%q@wz3nzbgnmj5siv9gp40hi-x(kt_a5mefjp&5jvfnw02my'
 
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.localhost', '127.0.0.1', 'empresa-modelo.localhost']
+ALLOWED_HOSTS = ['*', '.localhost', '127.0.0.1', 'empresa-modelo.localhost', '3ae4-2804-18-133-790-e0c1-66c1-bdac-9162.ngrok-free.app']
 
 
 # Application definition
@@ -46,6 +51,8 @@ INSTALLED_APPS = [
     'usuarios',
     
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'middleware.debug_host.PrintHostMiddleware',  # 👈 adicione aqui
@@ -65,6 +72,7 @@ SHARED_APPS = (
     'usuarios',
     'django.contrib.contenttypes',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.messages',

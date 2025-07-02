@@ -75,6 +75,17 @@ class Consulta(models.Model):
 
     retorno_necessario = models.BooleanField(default=False)
     data_retorno = models.DateTimeField(null=True, blank=True)
+    analise_ia = models.TextField(blank=True, null=True)
+    status_analise_ia = models.CharField(
+        max_length=20,
+        choices=[
+            ("pendente", "Pendente"),
+            ("em_analise", "Em Análise"),
+            ("concluida", "Concluída"),
+            ("erro", "Erro"),
+        ],
+        default="pendente"
+    )
 
     class Meta:
         ordering = ['-data_hora']

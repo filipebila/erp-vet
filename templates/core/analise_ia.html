@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}📊 Análise da IA{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-success mb-4">📊 Análise Inteligente da Consulta</h2>
+
+    <div class="card mb-4 shadow">
+        <div class="card-body">
+            <h5 class="card-title">{{ consulta.paciente.nome }} ({{ consulta.paciente.especie }})</h5>
+            <p class="mb-1"><strong>Raça:</strong> {{ consulta.paciente.raca }}</p>
+            <p class="mb-1"><strong>Data da consulta:</strong> {{ consulta.data_hora|date:"d/m/Y H:i" }}</p>
+            <p class="mb-1"><strong>Motivo:</strong> {{ consulta.motivo }}</p>
+        </div>
+    </div>
+
+    {% if consulta.analise_ia %}
+    <div class="accordion" id="analiseAccordion">
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button bg-success text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    📌 Análise Geral
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+                <div class="accordion-body" style="white-space: pre-wrap;">
+                    {{ consulta.analise_ia }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-3">
+        ⚠️ A análise ainda não foi gerada ou ocorreu um erro.
+    </div>
+    {% endif %}
+
+    <a href="{% url 'consultas-detail' consulta.pk %}" class="btn btn-secondary mt-4">← Voltar à Consulta</a>
+</div>
+{% endblock %}
